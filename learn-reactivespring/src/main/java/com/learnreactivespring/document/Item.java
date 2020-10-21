@@ -6,10 +6,10 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Document // to represent an mongodb document mapping class
+@Data // getters , setters , toString ... are injected
+@AllArgsConstructor // name implies
+@NoArgsConstructor // name implies
 public class Item {
 
     @Id
