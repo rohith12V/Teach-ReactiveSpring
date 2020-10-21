@@ -22,7 +22,8 @@ public class ItemController {
         log.error("Exception caught in handleRuntimeException :  {} " , ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
     }*/
-
+   
+   
     @Autowired
     ItemReactiveRepository itemReactiveRepository;
 
@@ -36,15 +37,16 @@ public class ItemController {
 
     @GetMapping(ITEM_END_POINT_V1+"/{id}")
     public Mono<ResponseEntity<Item>> getOneItem(@PathVariable String id){
-
+       
+       // get item -> map it to a respone entity -> provide a default value
         return itemReactiveRepository.findById(id)
                 .map((item) -> new ResponseEntity<>(item, HttpStatus.OK))
-                .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+                .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));  // check if body is null if so return default value
 
     }
 
     @PostMapping(ITEM_END_POINT_V1)
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.CREATED) //The status code is applied to the HTTP response, overrides status information set by other means, like ResponseEntity or redirect:
     public Mono<Item> createItem(@RequestBody Item item){
 
         return itemReactiveRepository.save(item);
@@ -66,19 +68,16 @@ public class ItemController {
         return itemReactiveRepository.findAll()
                 .concatWith(Mono.error(new RuntimeException("RuntimeException Occurred.")));
     }
+   
+   
+   // Read Response Body and QueryParameter from the request
 
-    //id and item to be updated in the req = path variable and request body - completed
-    // using the id get the item from database - completed
-    // updated the item retrieved with the value from the request body - completed
-    // save the item - completed
-    //return the saved item - completed
     @PutMapping(ITEM_END_POINT_V1+"/{id}")
     public Mono<ResponseEntity<Item>> updateItem(@PathVariable String id,
                                                  @RequestBody Item item){
-
+// flat map -> generate new Stream ( dynamically merges )
         return itemReactiveRepository.findById(id)
                 .flatMap(currentItem -> {
-
                     currentItem.setPrice(item.getPrice());
                     currentItem.setDescription(item.getDescription());
                     return itemReactiveRepository.save(currentItem);
